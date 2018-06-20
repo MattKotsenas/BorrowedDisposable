@@ -3,18 +3,15 @@ using BorrowedDisposable.Core;
 
 public class MockDisposableConsumer
 {
-    public void UseOwnedDisposable(IOwnedDisposable ownedDisposable)
+    public void UseOwnedDisposable(OwnedDisposable<MockDisposable> ownedDisposable)
     {
-
     }
 
-    public void UseBorrowedDisposable(IBorrowedDisposable borrowedDisposable)
+    public void UseBorrowedDisposable(BorrowedDisposable<MockDisposable> borrowedDisposable)
     {
-
     }
 
-    public void UseDisposable(IDisposable disposable)
+    public void UseDisposable(MockDisposable disposable)
     {
-
     }
 }

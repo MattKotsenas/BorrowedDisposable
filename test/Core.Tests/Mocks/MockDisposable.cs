@@ -1,13 +1,14 @@
 using System;
-using BorrowedDisposable.Core;
 
-public class MockOwnedDisposable : IOwnedDisposable
+public class MockDisposable : IDisposable
 {
+    public int DisposeCallCount { get; private set; }
+
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)
         {
-
+            DisposeCallCount++;
         }
     }
 
