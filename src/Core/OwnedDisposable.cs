@@ -4,24 +4,18 @@ namespace BorrowedDisposable.Core
 {
     public struct OwnedDisposable<T> : IDisposable where T : IDisposable
     {
-        private readonly T _inner;
+        internal readonly T Inner;
 
-        public OwnedDisposable(T inner)
+        internal OwnedDisposable(T inner)
         {
-            _inner = inner;
-        }
-
-        // TODO: Should this be an implicit or explicit operator (ease-of-use vs. safety)
-        public static implicit operator T(OwnedDisposable<T> owned)
-        {
-            return owned._inner;
+            Inner = inner;
         }
 
         private void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _inner.Dispose();
+                Inner.Dispose();
             }
         }
 

@@ -4,19 +4,13 @@ namespace BorrowedDisposable.Core
 {
     public struct BorrowedDisposable<T> : IDisposable where T : IDisposable
     {
-        private readonly T _inner;
+        internal readonly T Inner;
         private readonly bool _isStrict; // TODO: Should this be part of the final API design?
 
-        public BorrowedDisposable(T inner, bool isStrict = false)
+        internal BorrowedDisposable(T inner, bool isStrict = false)
         {
-            _inner = inner;
+            Inner = inner;
             _isStrict = isStrict;
-        }
-
-        // TODO: Should this be an implicit or explicit operator (ease-of-use vs. safety)
-        public static implicit operator T(BorrowedDisposable<T> owned)
-        {
-            return owned._inner;
         }
 
         private void Dispose(bool disposing)

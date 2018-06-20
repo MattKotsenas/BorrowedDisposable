@@ -17,7 +17,7 @@ namespace Core.Tests
 
         public Given_an_instance_of_an_OwnedDisposable()
         {
-            _ownedDisposable = new OwnedDisposable<MockDisposable>(Disposable);
+            _ownedDisposable = Disposable.AsOwned();
         }
 
         [TestMethod]
@@ -27,9 +27,15 @@ namespace Core.Tests
         }
 
         [TestMethod]
+        public void It_can_be_used_as_a_BorrowedDisposable()
+        {
+            Consumer.UseBorrowedDisposable(_ownedDisposable.AsBorrowed());
+        }
+
+        [TestMethod]
         public void It_can_be_used_as_an_IDisposable()
         {
-            Consumer.UseDisposable(_ownedDisposable);
+            Consumer.UseDisposable(_ownedDisposable.AsDisposableUnsafe());
         }
 
         [TestMethod]
@@ -47,7 +53,7 @@ namespace Core.Tests
 
         public Given_an_instance_of_a_BorrowedDisposable()
         {
-            _borrowedDisposable = new BorrowedDisposable<MockDisposable>(Disposable);
+            _borrowedDisposable = Disposable.AsBorrowed();
         }
 
         [TestMethod]
@@ -59,7 +65,7 @@ namespace Core.Tests
         [TestMethod]
         public void It_can_be_used_as_an_IDisposable()
         {
-            Consumer.UseDisposable(_borrowedDisposable);
+            Consumer.UseDisposable(_borrowedDisposable.AsDisposableUnsafe());
         }
 
         [TestMethod]
@@ -77,7 +83,7 @@ namespace Core.Tests
 
         public Given_an_instance_of_a_BorrowedDisposable_with_strict_mode_set()
         {
-            _borrowedDisposable = new BorrowedDisposable<MockDisposable>(Disposable, isStrict: true);
+            _borrowedDisposable = Disposable.AsBorrowed(isStrict: true);
         }
 
         [TestMethod]
@@ -89,7 +95,7 @@ namespace Core.Tests
         [TestMethod]
         public void It_can_be_used_as_an_IDisposable()
         {
-            Consumer.UseDisposable(_borrowedDisposable);
+            Consumer.UseDisposable(_borrowedDisposable.AsDisposableUnsafe());
         }
 
         [TestMethod]
