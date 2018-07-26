@@ -1,6 +1,6 @@
 using System;
 
-namespace BorrowedDisposable.Core
+namespace Lagan.Core
 {
     public struct BorrowedDisposable<T> : IDisposable where T : IDisposable
     {
@@ -19,7 +19,7 @@ namespace BorrowedDisposable.Core
             {
                 if (_isStrict)
                 {
-                    throw new InvalidOperationException($"Attempt to dispose of a {nameof(BorrowedDisposable)}");
+                    throw new InvalidOperationException($"Attempt to dispose of a {nameof(BorrowedDisposable<T>)}");
                 }
             }
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BorrowedDisposable.Core
+namespace Lagan.Core
 {
     public struct OwnedDisposable<T> : IDisposable where T : IDisposable
     {

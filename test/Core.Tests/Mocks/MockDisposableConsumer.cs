@@ -1,17 +1,17 @@
-using System;
-using BorrowedDisposable.Core;
-
-public class MockDisposableConsumer
+namespace Lagan.Core.Tests
 {
-    public void UseOwnedDisposable(OwnedDisposable<MockDisposable> ownedDisposable)
+    public class MockDisposableConsumer
     {
-    }
+        public void UseOwnedDisposable(OwnedDisposable<MockDisposable> ownedDisposable)
+        {
+        }
 
-    public void UseBorrowedDisposable(BorrowedDisposable<MockDisposable> borrowedDisposable)
-    {
-    }
+        public void UseBorrowedDisposable(BorrowedDisposable<MockDisposable> borrowedDisposable)
+        {
+        }
 
-    public void UseDisposable(MockDisposable disposable)
-    {
+        public void UseDisposable(MockDisposable disposable)
+        {
+        }
     }
 }

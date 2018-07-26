@@ -1,8 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using BorrowedDisposable.Core;
 using System;
 
-namespace Core.Tests
+namespace Lagan.Core.Tests
 {
     public abstract class ConversionTestsBase
     {

@@ -1,20 +1,23 @@
 using System;
 
-public class MockDisposable : IDisposable
+namespace Lagan.Core.Tests
 {
-    public int DisposeCallCount { get; private set; }
-
-    protected virtual void Dispose(bool disposing)
+    public class MockDisposable : IDisposable
     {
-        if (disposing)
+        public int DisposeCallCount { get; private set; }
+
+        protected virtual void Dispose(bool disposing)
         {
-            DisposeCallCount++;
+            if (disposing)
+            {
+                DisposeCallCount++;
+            }
         }
-    }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

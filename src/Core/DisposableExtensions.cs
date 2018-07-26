@@ -1,6 +1,6 @@
 using System;
 
-namespace BorrowedDisposable.Core
+namespace Lagan.Core
 {
     public static class DisposableExtensions
     {
