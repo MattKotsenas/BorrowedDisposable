@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -51,20 +53,44 @@ namespace Lagan.Analyzer
             return attribute.ContainingNamespace.ToDisplayString() == ns && attribute.Name == name;
         }
 
+        private static IReadOnlyCollection<ITypeSymbol> GetAttributeSymbols(SyntaxNode node, SemanticModel model)
+        {
+            IReadOnlyCollection<AttributeListSyntax> lists;
+
+            // There's no base type / interface to get attributes from, so try casting to the concrete type.
+            if (node is FieldDeclarationSyntax field) { lists = field.AttributeLists; }
+            else if (node is ParameterSyntax parameter) { lists = parameter.AttributeLists; }
+            else { lists = Array.Empty<AttributeListSyntax>(); }
+
+            return lists.SelectMany(attributeLists => attributeLists.Attributes).Select(attribute => model.GetTypeInfo(attribute).Type).ToList();
+        }
+
         private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is FieldDeclarationSyntax node)
+            if (context.Node is FieldDeclarationSyntax field)
             {
-                var attributes = node.AttributeLists.SelectMany(attributeLists => attributeLists.Attributes).Select(attribute => context.SemanticModel.GetTypeInfo(attribute).Type).ToList();
-                var typeInfo = context.SemanticModel.GetTypeInfo(node.Declaration.Type).Type;
+                var attributes = GetAttributeSymbols(field, context.SemanticModel);
+                var typeInfo = context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type;
 
                 if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute))
                 {
-                    foreach (var identifier in node.Declaration.Variables.Select(variable => variable.Identifier))
+                    foreach (var identifier in field.Declaration.Variables.Select(variable => variable.Identifier))
                     {
                         var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), identifier.ValueText);
                         context.ReportDiagnostic(diagnostic);
                     }
+                }
+            }
+            else if (context.Node is ParameterSyntax parameter)
+            {
+                var attributes = GetAttributeSymbols(parameter, context.SemanticModel);
+                var typeInfo = context.SemanticModel.GetTypeInfo(parameter.Type).Type;
+
+                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute))
+                {
+                    var identifier = parameter.Identifier;
+                    var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), identifier.ValueText);
+                    context.ReportDiagnostic(diagnostic);
                 }
             }
         }
