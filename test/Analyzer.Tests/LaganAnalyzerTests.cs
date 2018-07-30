@@ -21,13 +21,15 @@ namespace Lagan.Analyzer.Tests
         }
     }
 
-    [TestClass]
-    public class GivenAnUnAdornedIDisposableMemberVariable : LaganCodeFixVerifier
+    public class GivenADisposableMemberVariable
     {
-        [TestMethod]
-        public void ItGivesAnAnalyzerWarning()
+        [TestClass]
+        public class WithNoAnnotation : LaganCodeFixVerifier
         {
-            var test = @"
+            [TestMethod]
+            public void ItGivesAnAnalyzerWarning()
+            {
+                var test = @"
                 using System.IO;
 
                 namespace ConsoleApplication1
@@ -39,25 +41,25 @@ namespace Lagan.Analyzer.Tests
                         public static void Main() { }
                     }
                 }";
-            var expected = new DiagnosticResult
-            {
-                Id = LaganAnalyzer.DiagnosticId,
-                Message = string.Format(LaganAnalyzer.MessageFormat.ToString(), "_stream"),
-                Severity = DiagnosticSeverity.Warning,
-                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 40) }
-            };
+                var expected = new DiagnosticResult
+                {
+                    Id = LaganAnalyzer.DiagnosticId,
+                    Message = string.Format(LaganAnalyzer.MessageFormat.ToString(), "_stream"),
+                    Severity = DiagnosticSeverity.Warning,
+                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 40) }
+                };
 
-            VerifyCSharpDiagnostic(test, expected);
+                VerifyCSharpDiagnostic(test, expected);
+            }
         }
-    }
 
-    [TestClass]
-    public class GivenAnOwnedAttributeAdornedMemberVariable : LaganCodeFixVerifier
-    {
-        [TestMethod]
-        public void ItDoesNotGiveAnAnalyzerWarning()
+        [TestClass]
+        public class WithAnOwnedAnnotation : LaganCodeFixVerifier
         {
-            var test = @"
+            [TestMethod]
+            public void ItDoesNotGiveAnAnalyzerWarning()
+            {
+                var test = @"
                 using System.IO;
                 using Lagan.Core;
 
@@ -72,17 +74,17 @@ namespace Lagan.Analyzer.Tests
                     }
                 }";
 
-            VerifyCSharpDiagnostic(test);
+                VerifyCSharpDiagnostic(test);
+            }
         }
-    }
 
-    [TestClass]
-    public class GivenABorroweddAttributeAdornedMemberVariable : LaganCodeFixVerifier
-    {
-        [TestMethod]
-        public void ItDoesNotGiveAnAnalyzerWarning()
+        [TestClass]
+        public class WithABorrowedAnnotation : LaganCodeFixVerifier
         {
-            var test = @"
+            [TestMethod]
+            public void ItDoesNotGiveAnAnalyzerWarning()
+            {
+                var test = @"
                 using System.IO;
                 using Lagan.Core;
 
@@ -97,7 +99,8 @@ namespace Lagan.Analyzer.Tests
                     }
                 }";
 
-            VerifyCSharpDiagnostic(test);
+                VerifyCSharpDiagnostic(test);
+            }
         }
     }
 }
