@@ -62,7 +62,7 @@ namespace Lagan.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type names should be all uppercase..
+        ///   Looks up a localized string similar to Instances of IDisposable should be marked as owned or borrowed for explicit lifetime management.
         /// </summary>
         internal static string AnalyzerDescription {
             get {
@@ -71,7 +71,7 @@ namespace Lagan.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name &apos;{0}&apos; contains lowercase letters.
+        ///   Looks up a localized string similar to Variable &apos;{0}&apos; implements IDisposable and has ambiguous lifetime.
         /// </summary>
         internal static string AnalyzerMessageFormat {
             get {
@@ -80,7 +80,7 @@ namespace Lagan.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name contains lowercase letters.
+        ///   Looks up a localized string similar to Instances of IDisposable have explicit lifetime.
         /// </summary>
         internal static string AnalyzerTitle {
             get {
