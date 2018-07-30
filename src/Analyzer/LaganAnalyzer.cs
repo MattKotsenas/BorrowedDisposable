@@ -43,6 +43,14 @@ namespace Lagan.Analyzer
             return attribute.ContainingNamespace.ToDisplayString() == ns && attribute.Name == name;
         }
 
+        private static bool IsBorrowedAttribute(ITypeSymbol attribute)
+        {
+            var ns = typeof(BorrowedAttribute).Namespace;
+            var name = nameof(BorrowedAttribute);
+
+            return attribute.ContainingNamespace.ToDisplayString() == ns && attribute.Name == name;
+        }
+
         private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
         {
             if (context.Node is FieldDeclarationSyntax node)
@@ -50,7 +58,7 @@ namespace Lagan.Analyzer
                 var attributes = node.AttributeLists.SelectMany(attributeLists => attributeLists.Attributes).Select(attribute => context.SemanticModel.GetTypeInfo(attribute).Type).ToList();
                 var typeInfo = context.SemanticModel.GetTypeInfo(node.Declaration.Type).Type;
 
-                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute))
+                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute))
                 {
                     foreach (var identifier in node.Declaration.Variables.Select(variable => variable.Identifier))
                     {

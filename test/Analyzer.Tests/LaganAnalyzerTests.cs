@@ -75,4 +75,29 @@ namespace Lagan.Analyzer.Tests
             VerifyCSharpDiagnostic(test);
         }
     }
+
+    [TestClass]
+    public class GivenABorroweddAttributeAdornedMemberVariable : LaganCodeFixVerifier
+    {
+        [TestMethod]
+        public void ItDoesNotGiveAnAnalyzerWarning()
+        {
+            var test = @"
+                using System.IO;
+                using Lagan.Core;
+
+                namespace ConsoleApplication1
+                {
+                    class TypeName
+                    {
+                        [Borrowed]
+                        private Stream _stream;
+
+                        public static void Main() { }
+                    }
+                }";
+
+            VerifyCSharpDiagnostic(test);
+        }
+    }
 }
