@@ -1,3 +1,4 @@
+using Lagan.Core;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -5,6 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 
 namespace Lagan.Analyzer.Tests.Verifiers
@@ -19,6 +21,13 @@ namespace Lagan.Analyzer.Tests.Verifiers
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+
+        // Lagan references
+        private static readonly IReadOnlyCollection<MetadataReference> LaganReferences = new[]
+        {
+            MetadataReference.CreateFromFile(Path.Combine(new FileInfo(typeof(object).Assembly.Location).DirectoryName, "System.Runtime.dll")),
+            MetadataReference.CreateFromFile(typeof(OwnedAttribute).Assembly.Location)
+        };
 
         internal static string DefaultFilePathPrefix = "Test";
         internal static string CSharpDefaultFileExt = "cs";
@@ -58,6 +67,13 @@ namespace Lagan.Analyzer.Tests.Verifiers
             foreach (var project in projects)
             {
                 var compilationWithAnalyzers = project.GetCompilationAsync().Result.WithAnalyzers(ImmutableArray.Create(analyzer));
+
+                var errors = compilationWithAnalyzers.GetAllDiagnosticsAsync().Result.Where(n => n.Severity == DiagnosticSeverity.Error);
+                if (errors.Any())
+                {
+                    throw new Exception($"Errors in compilation: {string.Join(Environment.NewLine, errors)}");
+                }
+
                 var diags = compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().Result;
                 foreach (var diag in diags)
                 {
@@ -152,7 +168,8 @@ namespace Lagan.Analyzer.Tests.Verifiers
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)
-                .AddMetadataReference(projectId, CodeAnalysisReference);
+                .AddMetadataReference(projectId, CodeAnalysisReference)
+                .AddMetadataReferences(projectId, LaganReferences);
 
             int count = 0;
             foreach (var source in sources)

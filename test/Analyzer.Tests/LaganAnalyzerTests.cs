@@ -4,11 +4,25 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Lagan.Analyzer.Tests.Helpers;
 using Lagan.Analyzer.Tests.Verifiers;
+using System.Linq;
 
 namespace Lagan.Analyzer.Tests
 {
+    public abstract class LaganCodeFixVerifier : CodeFixVerifier
+    {
+        protected override CodeFixProvider GetCSharpCodeFixProvider()
+        {
+            return new LaganCodeFixProvider();
+        }
+
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+        {
+            return new LaganAnalyzer();
+        }
+    }
+
     [TestClass]
-    public class GivenAnUnAdornedIDisposableMemberVariable : CodeFixVerifier
+    public class GivenAnUnAdornedIDisposableMemberVariable : LaganCodeFixVerifier
     {
         [TestMethod]
         public void ItGivesAnAnalyzerWarning()
@@ -21,6 +35,8 @@ namespace Lagan.Analyzer.Tests
                     class TypeName
                     {
                         private Stream _stream;
+
+                        public static void Main() { }
                     }
                 }";
             var expected = new DiagnosticResult
@@ -33,15 +49,30 @@ namespace Lagan.Analyzer.Tests
 
             VerifyCSharpDiagnostic(test, expected);
         }
+    }
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
+    [TestClass]
+    public class GivenAnOwnedAttributeAdornedMemberVariable : LaganCodeFixVerifier
+    {
+        [TestMethod]
+        public void ItDoesNotGiveAnAnalyzerWarning()
         {
-            return new LaganCodeFixProvider();
-        }
+            var test = @"
+                using System.IO;
+                using Lagan.Core;
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new LaganAnalyzer();
+                namespace ConsoleApplication1
+                {
+                    class TypeName
+                    {
+                        [Owned]
+                        private Stream _stream;
+
+                        public static void Main() { }
+                    }
+                }";
+
+            VerifyCSharpDiagnostic(test);
         }
     }
 }

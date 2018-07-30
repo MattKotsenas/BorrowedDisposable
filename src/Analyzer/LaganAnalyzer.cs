@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using Lagan.Core;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -34,15 +35,24 @@ namespace Lagan.Analyzer
             return typeSymbol.AllInterfaces.Any(i => i.ContainingNamespace.Name == "System" && i.Name == "IDisposable");
         }
 
+        private static bool IsOwnedAttribute(ITypeSymbol attribute)
+        {
+            var ns = typeof(OwnedAttribute).Namespace;
+            var name = nameof(OwnedAttribute);
+
+            return attribute.ContainingNamespace.ToDisplayString() == ns && attribute.Name == name;
+        }
+
         private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is VariableDeclarationSyntax node)
+            if (context.Node is FieldDeclarationSyntax node)
             {
-                var typeInfo = context.SemanticModel.GetTypeInfo(node.Type).Type;
+                var attributes = node.AttributeLists.SelectMany(attributeLists => attributeLists.Attributes).Select(attribute => context.SemanticModel.GetTypeInfo(attribute).Type).ToList();
+                var typeInfo = context.SemanticModel.GetTypeInfo(node.Declaration.Type).Type;
 
-                if (ImplementsIDisposable(typeInfo))
+                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute))
                 {
-                    foreach (var identifier in node.Variables.Select(variable => variable.Identifier))
+                    foreach (var identifier in node.Declaration.Variables.Select(variable => variable.Identifier))
                     {
                         var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), identifier.ValueText);
                         context.ReportDiagnostic(diagnostic);
