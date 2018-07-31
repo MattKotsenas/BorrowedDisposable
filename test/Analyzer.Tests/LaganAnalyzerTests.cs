@@ -20,280 +20,105 @@ namespace Lagan.Analyzer.Tests
         }
     }
 
-    public class GivenADisposableMemberVariable
+    [TestClass]
+    public class GivenADisposableMemberVariable : LaganCodeFixVerifier
     {
-        [TestClass]
-        public class WithNoAnnotation : LaganCodeFixVerifier
+        [DataTestMethod]
+        [DataRow("private Stream", "_stream", true, 40, DisplayName = "With no annotation")]
+        [DataRow("[Owned] private Stream", "_stream", false, -1, DisplayName = "With [Owned]")]
+        [DataRow("[Borrowed] private Stream", "_stream", false, -1, DisplayName = "With [Borrowed]")]
+        [DataRow("private Owned<Stream>", "_stream", false, -1, DisplayName = "With Owned<T>")]
+        [DataRow("private Borrowed<Stream>", "_stream", false, -1, DisplayName = "With Borrowed<T>")]
+        public void ItAnalyzesAndGivesAWarningIfNeeded(string declatation, string name, bool shouldHaveDiagnostic, int column)
         {
-            [TestMethod]
-            public void ItGivesAnAnalyzerWarning()
-            {
-                var test = @"
+            var test = @"
                 using System.IO;
+                using Lagan.Core;
 
                 namespace ConsoleApplication1
                 {
                     class TypeName
                     {
-                        private Stream _stream;
+                        $declaration$ $name$;
 
                         public static void Main() { }
                     }
-                }";
+                }".Replace("$declaration$", declatation).Replace("$name$", name);
 
+            if (shouldHaveDiagnostic)
+            {
                 var expected = new DiagnosticResult
                 {
                     Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.MissingLifetimeDiagnostic.MessageFormat.ToString(), "_stream"),
+                    Message = string.Format(LaganAnalyzer.MissingLifetimeDiagnostic.MessageFormat.ToString(), name),
                     Severity = DiagnosticSeverity.Warning,
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 40) }
+                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 9, column) }
                 };
-
                 VerifyCSharpDiagnostic(test, expected);
             }
-        }
-
-        [TestClass]
-        public class WithAnOwnedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
+            else
             {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        [Owned]
-                        private Stream _stream;
-
-                        public static void Main() { }
-                    }
-                }";
-
-                VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithAnOwnedType : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private Owned<Stream> _stream;
-
-                        public static void Main() { }
-                    }
-                }";
-
-                VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithABorrowedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        [Borrowed]
-                        private Stream _stream;
-
-                        public static void Main() { }
-                    }
-                }";
-
-                VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithABorrowedType : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private Borrowed<Stream> _stream;
-
-                        public static void Main() { }
-                    }
-                }";
-
                 VerifyCSharpDiagnostic(test);
             }
         }
     }
 
-    public class GivenADisposableParameter
+    [TestClass]
+    public class GivenADisposableParameter : LaganCodeFixVerifier
     {
-        [TestClass]
-        public class WithNoAnnotation : LaganCodeFixVerifier
+        [DataTestMethod]
+        [DataRow("Stream", "stream", true, 59, DisplayName = "With no annotation")]
+        [DataRow("[Owned] Stream", "stream", false, -1, DisplayName = "With [Owned]")]
+        [DataRow("[Borrowed] Stream", "stream", false, -1, DisplayName = "With [Borrowed]")]
+        [DataRow("Owned<Stream>", "stream", false, -1, DisplayName = "With Owned<T>")]
+        [DataRow("Borrowed<Stream>", "stream", false, -1, DisplayName = "With Borrowed<T>")]
+        public void ItAnalyzesAndGivesAWarningIfNeeded(string declatation, string name, bool shouldHaveDiagnostic, int column)
         {
-            [TestMethod]
-            public void ItGivesAnAnalyzerWarning()
-            {
-                var test = @"
+            var test = @"
                 using System.IO;
+                using Lagan.Core;
 
                 namespace ConsoleApplication1
                 {
                     class TypeName
                     {
-                        private void UseDisposable(Stream stream) { }
+                        private void UseDisposable($declaration$ $name$) { }
 
                         public static void Main() { }
                     }
-                }";
+                }".Replace("$declaration$", declatation).Replace("$name$", name);
 
+            if (shouldHaveDiagnostic)
+            {
                 var expected = new DiagnosticResult
                 {
                     Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.MissingLifetimeDiagnostic.MessageFormat.ToString(), "stream"),
+                    Message = string.Format(LaganAnalyzer.MissingLifetimeDiagnostic.MessageFormat.ToString(), name),
                     Severity = DiagnosticSeverity.Warning,
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 59) }
+                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 9, column) }
                 };
-
                 VerifyCSharpDiagnostic(test, expected);
             }
-        }
-
-        [TestClass]
-        public class WithAnOwnedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
+            else
             {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private void UseDisposable([Owned] Stream stream) { }
-
-                        public static void Main() { }
-                    }
-                }";
-
-                VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithAnOwnedType : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private void UseDisposable(Owned<Stream> stream) { }
-
-                        public static void Main() { }
-                    }
-                }";
-
-                VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithABorrowedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private void UseDisposable([Borrowed] Stream stream) { }
-
-                        public static void Main() { }
-                    }
-                }";
-
-                VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithABorrowedType : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private void UseDisposable(Borrowed<Stream> stream) { }
-
-                        public static void Main() { }
-                    }
-                }";
-
                 VerifyCSharpDiagnostic(test);
             }
         }
     }
 
-    public class GivenANonDisposableParameter
+    [TestClass]
+    public class GivenANonDisposableParameter : LaganCodeFixVerifier
     {
         // Note that we don't need to test the case of a non-disposable type in the type parameter
         // because our generic constraint on Owned<T> and Borrowed<T> prevents that from compiling
 
-        [TestClass]
-        public class WithNoAnnotation : LaganCodeFixVerifier
+        [DataTestMethod]
+        [DataRow("string", "myString", false, -1, DisplayName = "With no annotation")]
+        [DataRow("[Owned] string", "myString", true, 57, DisplayName = "With [Owned]")]
+        [DataRow("[Borrowed] string", "myString", true, 60, DisplayName = "With [Borrowed]")]
+        public void ItAnalyzesAndGivesAWarningIfNeeded(string declatation, string name, bool shouldHaveDiagnostic, int column)
         {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
+            var test = @"
                 using System.IO;
                 using Lagan.Core;
 
@@ -301,93 +126,43 @@ namespace Lagan.Analyzer.Tests
                 {
                     class TypeName
                     {
-                        private void Use(string myString) { }
+                        private void Use($declaration$ $name$) { }
 
                         public static void Main() { }
                     }
-                }";
+                }".Replace("$declaration$", declatation).Replace("$name$", name);
 
+            if (shouldHaveDiagnostic)
+            {
+                var expected = new DiagnosticResult
+                {
+                    Id = LaganAnalyzer.DiagnosticId,
+                    Message = string.Format(LaganAnalyzer.UnnecessaryLifetimeDiagnostic.MessageFormat.ToString(), name),
+                    Severity = DiagnosticSeverity.Warning,
+                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 9, column) }
+                };
+                VerifyCSharpDiagnostic(test, expected);
+            }
+            else
+            {
                 VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithAnOwnedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItGivesAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private void Use([Owned] string myString) { }
-
-                        public static void Main() { }
-                    }
-                }";
-
-                var expected = new DiagnosticResult
-                {
-                    Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.UnnecessaryLifetimeDiagnostic.MessageFormat.ToString(), "myString"),
-                    Severity = DiagnosticSeverity.Warning,
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 9, 57) }
-                };
-
-                VerifyCSharpDiagnostic(test, expected);
-            }
-        }
-
-        [TestClass]
-        public class WithABorrowedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItGivesAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        private void Use([Borrowed] string myString) { }
-
-                        public static void Main() { }
-                    }
-                }";
-
-                var expected = new DiagnosticResult
-                {
-                    Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.UnnecessaryLifetimeDiagnostic.MessageFormat.ToString(), "myString"),
-                    Severity = DiagnosticSeverity.Warning,
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 9, 60) }
-                };
-
-                VerifyCSharpDiagnostic(test, expected);
             }
         }
     }
 
-    public class GivenANonDisposableMemberVariable
+    [TestClass]
+    public class GivenANonDisposableMemberVariable : LaganCodeFixVerifier
     {
         // Note that we don't need to test the case of a non-disposable type in the type parameter
         // because our generic constraint on Owned<T> and Borrowed<T> prevents that from compiling
 
-        [TestClass]
-        public class WithNoAnnotation : LaganCodeFixVerifier
+        [DataTestMethod]
+        [DataRow("private string", "_myString", false, -1, DisplayName = "With no annotation")]
+        [DataRow("[Owned] private string", "_myString", true, 48, DisplayName = "With [Owned]")]
+        [DataRow("[Borrowed] private string", "_myString", true, 51, DisplayName = "With [Borrowed]")]
+        public void ItAnalyzesAndGivesAWarningIfNeeded(string declatation, string name, bool shouldHaveDiagnostic, int column)
         {
-            [TestMethod]
-            public void ItDoesNotGiveAnAnalyzerWarning()
-            {
-                var test = @"
+            var test = @"
                 using System.IO;
                 using Lagan.Core;
 
@@ -395,79 +170,26 @@ namespace Lagan.Analyzer.Tests
                 {
                     class TypeName
                     {
-                        private string _myString;
+                        $declaration$ $name$;
 
                         public static void Main() { }
                     }
-                }";
+                }".Replace("$declaration$", declatation).Replace("$name$", name);
 
+            if (shouldHaveDiagnostic)
+            {
+                var expected = new DiagnosticResult
+                {
+                    Id = LaganAnalyzer.DiagnosticId,
+                    Message = string.Format(LaganAnalyzer.UnnecessaryLifetimeDiagnostic.MessageFormat.ToString(), name),
+                    Severity = DiagnosticSeverity.Warning,
+                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 9, column) }
+                };
+                VerifyCSharpDiagnostic(test, expected);
+            }
+            else
+            {
                 VerifyCSharpDiagnostic(test);
-            }
-        }
-
-        [TestClass]
-        public class WithAnOwnedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItGivesAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        [Owned]
-                        private string _myString;
-
-                        public static void Main() { }
-                    }
-                }";
-
-                var expected = new DiagnosticResult
-                {
-                    Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.UnnecessaryLifetimeDiagnostic.MessageFormat.ToString(), "_myString"),
-                    Severity = DiagnosticSeverity.Warning,
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 10, 40) }
-                };
-
-                VerifyCSharpDiagnostic(test, expected);
-            }
-        }
-
-        [TestClass]
-        public class WithABorrowedAnnotation : LaganCodeFixVerifier
-        {
-            [TestMethod]
-            public void ItGivesAnAnalyzerWarning()
-            {
-                var test = @"
-                using System.IO;
-                using Lagan.Core;
-
-                namespace ConsoleApplication1
-                {
-                    class TypeName
-                    {
-                        [Borrowed]
-                        private string _myString;
-
-                        public static void Main() { }
-                    }
-                }";
-
-                var expected = new DiagnosticResult
-                {
-                    Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.UnnecessaryLifetimeDiagnostic.MessageFormat.ToString(), "_myString"),
-                    Severity = DiagnosticSeverity.Warning,
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 10, 40) }
-                };
-
-                VerifyCSharpDiagnostic(test, expected);
             }
         }
     }
