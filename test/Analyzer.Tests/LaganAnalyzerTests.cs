@@ -44,7 +44,7 @@ namespace Lagan.Analyzer.Tests
                 var expected = new DiagnosticResult
                 {
                     Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.MessageFormat.ToString(), "_stream"),
+                    Message = string.Format(LaganAnalyzer.MissingLifetimeDiagnostic.MessageFormat.ToString(), "_stream"),
                     Severity = DiagnosticSeverity.Warning,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 40) }
                 };
@@ -127,7 +127,7 @@ namespace Lagan.Analyzer.Tests
                 var expected = new DiagnosticResult
                 {
                     Id = LaganAnalyzer.DiagnosticId,
-                    Message = string.Format(LaganAnalyzer.MessageFormat.ToString(), "stream"),
+                    Message = string.Format(LaganAnalyzer.MissingLifetimeDiagnostic.MessageFormat.ToString(), "stream"),
                     Severity = DiagnosticSeverity.Warning,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 59) }
                 };
