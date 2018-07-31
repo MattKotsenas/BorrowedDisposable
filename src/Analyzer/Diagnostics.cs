@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 
 namespace Lagan.Analyzer
 {
@@ -12,13 +13,38 @@ namespace Lagan.Analyzer
         DiagnosticDescriptor Rule { get; }
     }
 
+    /// <summary>
+    /// This diagnostic is for instances of <see cref="IDisposable"/> with annotation
+    /// </summary>
     public class MissingLifetimeDiagnostic : IDiagnostic
     {
         public MissingLifetimeDiagnostic()
         {
-            Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-            MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-            Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+            Title = new LocalizableResourceString(nameof(Resources.MissingLifetimeTitle), Resources.ResourceManager, typeof(Resources));
+            MessageFormat = new LocalizableResourceString(nameof(Resources.MissingLifetimeMessageFormat), Resources.ResourceManager, typeof(Resources));
+            Description = new LocalizableResourceString(nameof(Resources.MissingLifetimeDescription), Resources.ResourceManager, typeof(Resources));
+            Rule = new DiagnosticDescriptor(LaganAnalyzer.DiagnosticId, Title, MessageFormat, LaganAnalyzer.Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        }
+
+        public LocalizableString Title { get; }
+
+        public LocalizableString MessageFormat { get; }
+
+        public LocalizableString Description { get; }
+
+        public DiagnosticDescriptor Rule { get; }
+    }
+
+    /// <summary>
+    /// This diagnostics is for when a user adds an annotation to something that does not implement <see cref="IDisposable"/>
+    /// </summary>
+    public class UnnecessaryLifetimeDiagnostic : IDiagnostic
+    {
+        public UnnecessaryLifetimeDiagnostic()
+        {
+            Title = new LocalizableResourceString(nameof(Resources.UnnecessaryLifetimeTitle), Resources.ResourceManager, typeof(Resources));
+            MessageFormat = new LocalizableResourceString(nameof(Resources.UnnecessaryLifetimeMessageFormat), Resources.ResourceManager, typeof(Resources));
+            Description = new LocalizableResourceString(nameof(Resources.UnnecessaryLifetimeDescription), Resources.ResourceManager, typeof(Resources));
             Rule = new DiagnosticDescriptor(LaganAnalyzer.DiagnosticId, Title, MessageFormat, LaganAnalyzer.Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
         }
 

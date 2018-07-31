@@ -18,8 +18,9 @@ namespace Lagan.Analyzer
         public static readonly string Category = "Design";
 
         public static readonly IDiagnostic MissingLifetimeDiagnostic = new MissingLifetimeDiagnostic();
+        public static readonly IDiagnostic UnnecessaryLifetimeDiagnostic = new UnnecessaryLifetimeDiagnostic();
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(MissingLifetimeDiagnostic.Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(MissingLifetimeDiagnostic.Rule, UnnecessaryLifetimeDiagnostic.Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -75,6 +76,11 @@ namespace Lagan.Analyzer
             return lists.SelectMany(attributeLists => attributeLists.Attributes).Select(attribute => model.GetTypeInfo(attribute).Type).ToList();
         }
 
+        private static bool HasLifetimeAnnotation(IReadOnlyCollection<ITypeSymbol> attributes, ITypeSymbol symbol)
+        {
+            return (attributes.Any(IsOwnedAttribute) || attributes.Any(IsBorrowedAttribute) || IsOwnedType(symbol) || IsBorrowedType(symbol));
+        }
+
         private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
         {
             if (context.Node is FieldDeclarationSyntax field)
@@ -82,12 +88,28 @@ namespace Lagan.Analyzer
                 var attributes = GetAttributeSymbols(field, context.SemanticModel);
                 var typeInfo = context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type;
 
-                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute) && !IsOwnedType(typeInfo) && !IsBorrowedType(typeInfo))
+                var hasLifetimeAnnotation = HasLifetimeAnnotation(attributes, typeInfo);
+
+                if (ImplementsIDisposable(typeInfo))
                 {
-                    foreach (var identifier in field.Declaration.Variables.Select(variable => variable.Identifier))
+                    if (!hasLifetimeAnnotation)
                     {
-                        var diagnostic = Diagnostic.Create(MissingLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
-                        context.ReportDiagnostic(diagnostic);
+                        foreach (var identifier in field.Declaration.Variables.Select(variable => variable.Identifier))
+                        {
+                            var diagnostic = Diagnostic.Create(MissingLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
+                            context.ReportDiagnostic(diagnostic);
+                        }
+                    }
+                }
+                else
+                {
+                    if (hasLifetimeAnnotation)
+                    {
+                        foreach (var identifier in field.Declaration.Variables.Select(variable => variable.Identifier))
+                        {
+                            var diagnostic = Diagnostic.Create(UnnecessaryLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
+                            context.ReportDiagnostic(diagnostic);
+                        }
                     }
                 }
             }
@@ -96,11 +118,25 @@ namespace Lagan.Analyzer
                 var attributes = GetAttributeSymbols(parameter, context.SemanticModel);
                 var typeInfo = context.SemanticModel.GetTypeInfo(parameter.Type).Type;
 
-                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute) && !IsOwnedType(typeInfo) && !IsBorrowedType(typeInfo))
+                var hasLifetimeAnnotation = HasLifetimeAnnotation(attributes, typeInfo);
+
+                if (ImplementsIDisposable(typeInfo))
                 {
-                    var identifier = parameter.Identifier;
-                    var diagnostic = Diagnostic.Create(MissingLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
-                    context.ReportDiagnostic(diagnostic);
+                    if (!hasLifetimeAnnotation)
+                    {
+                        var identifier = parameter.Identifier;
+                        var diagnostic = Diagnostic.Create(MissingLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
+                        context.ReportDiagnostic(diagnostic);
+                    }
+                }
+                else
+                {
+                    if (hasLifetimeAnnotation)
+                    {
+                        var identifier = parameter.Identifier;
+                        var diagnostic = Diagnostic.Create(UnnecessaryLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
+                        context.ReportDiagnostic(diagnostic);
+                    }
                 }
             }
         }

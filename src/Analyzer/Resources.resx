@@ -117,16 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AnalyzerDescription" xml:space="preserve">
+  <data name="MissingLifetimeDescription" xml:space="preserve">
     <value>Instances of IDisposable should be marked as owned or borrowed for explicit lifetime management</value>
     <comment>An optional longer localizable description of the diagnostic.</comment>
   </data>
-  <data name="AnalyzerMessageFormat" xml:space="preserve">
+  <data name="MissingLifetimeMessageFormat" xml:space="preserve">
     <value>Variable '{0}' implements IDisposable and has ambiguous lifetime</value>
     <comment>The format-able message the diagnostic displays.</comment>
   </data>
-  <data name="AnalyzerTitle" xml:space="preserve">
+  <data name="MissingLifetimeTitle" xml:space="preserve">
     <value>Instances of IDisposable have explicit lifetime</value>
     <comment>The title of the diagnostic.</comment>
+  </data>
+  <data name="UnnecessaryLifetimeDescription" xml:space="preserve">
+    <value>Instances that do not implement IDisposable should not be annotated</value>
+  </data>
+  <data name="UnnecessaryLifetimeMessageFormat" xml:space="preserve">
+    <value>Variable '{0}' does not implement IDisposable and should not be annotated</value>
+  </data>
+  <data name="UnnecessaryLifetimeTitle" xml:space="preserve">
+    <value>Lifetime annotation on non-disposable types</value>
   </data>
 </root>
