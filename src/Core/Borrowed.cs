@@ -2,16 +2,22 @@ using System;
 
 namespace Lagan.Core
 {
-    public struct Borrowed<T> : IDisposable where T : IDisposable
+    public interface Borrowed<out T> : IDisposable where T : IDisposable
     {
-        internal readonly T Inner;
+        T UnsafeValue { get; } // TODO: Is there a way to remove this?
+    }
+
+    internal struct BorrowedContainer<T> : Borrowed<T> where T : IDisposable
+    {
         private readonly bool _isStrict; // TODO: Should this be part of the final API design?
 
-        internal Borrowed(T inner, bool isStrict = false)
+        internal BorrowedContainer(T value, bool isStrict = false)
         {
-            Inner = inner;
+            UnsafeValue = value;
             _isStrict = isStrict;
         }
+
+        public T UnsafeValue { get; }
 
         private void Dispose(bool disposing)
         {

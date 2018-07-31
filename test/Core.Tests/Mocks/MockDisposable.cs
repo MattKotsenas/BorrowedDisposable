@@ -20,4 +20,8 @@ namespace Lagan.Core.Tests
             GC.SuppressFinalize(this);
         }
     }
+
+    public class MockDisposableSubclass : MockDisposable
+    {
+    }
 }

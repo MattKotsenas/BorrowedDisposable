@@ -5,28 +5,28 @@ namespace Lagan.Core.Tests
 {
     public abstract class ConversionTestsBase
     {
-        protected readonly MockDisposable Disposable = new MockDisposable();
+        protected readonly MockDisposableSubclass Disposable = new MockDisposableSubclass();
         protected readonly MockDisposableConsumer Consumer = new MockDisposableConsumer();
     }
 
     [TestClass]
-    public class Given_an_instance_of_an_OwnedDisposable : ConversionTestsBase
+    public class Given_an_instance_of_an_Owned_disposable : ConversionTestsBase
     {
-        private readonly Owned<MockDisposable> _ownedDisposable;
+        private readonly Owned<MockDisposableSubclass> _ownedDisposable;
 
-        public Given_an_instance_of_an_OwnedDisposable()
+        public Given_an_instance_of_an_Owned_disposable()
         {
             _ownedDisposable = Disposable.AsOwned();
         }
 
         [TestMethod]
-        public void It_can_be_used_as_an_OwnedDisposable()
+        public void It_can_be_used_as_an_Owned_disposable()
         {
             Consumer.UseOwned(_ownedDisposable);
         }
 
         [TestMethod]
-        public void It_can_be_used_as_a_BorrowedDisposable()
+        public void It_can_be_used_as_a_Borrowed_disposable()
         {
             Consumer.UseBorrowed(_ownedDisposable.AsBorrowed());
         }
@@ -34,7 +34,7 @@ namespace Lagan.Core.Tests
         [TestMethod]
         public void It_can_be_used_as_an_IDisposable()
         {
-            Consumer.Use(_ownedDisposable.AsDisposableUnsafe());
+            Consumer.Use(_ownedDisposable.UnsafeValue);
         }
 
         [TestMethod]
@@ -48,7 +48,7 @@ namespace Lagan.Core.Tests
     [TestClass]
     public class Given_an_instance_of_a_BorrowedDisposable : ConversionTestsBase
     {
-        private readonly Borrowed<MockDisposable> _borrowedDisposable;
+        private readonly Borrowed<MockDisposableSubclass> _borrowedDisposable;
 
         public Given_an_instance_of_a_BorrowedDisposable()
         {
@@ -64,7 +64,7 @@ namespace Lagan.Core.Tests
         [TestMethod]
         public void It_can_be_used_as_an_IDisposable()
         {
-            Consumer.Use(_borrowedDisposable.AsDisposableUnsafe());
+            Consumer.Use(_borrowedDisposable.UnsafeValue);
         }
 
         [TestMethod]
@@ -78,7 +78,7 @@ namespace Lagan.Core.Tests
     [TestClass]
     public class Given_an_instance_of_a_BorrowedDisposable_with_strict_mode_set : ConversionTestsBase
     {
-        private readonly Borrowed<MockDisposable> _borrowedDisposable;
+        private readonly Borrowed<MockDisposableSubclass> _borrowedDisposable;
 
         public Given_an_instance_of_a_BorrowedDisposable_with_strict_mode_set()
         {
@@ -94,7 +94,7 @@ namespace Lagan.Core.Tests
         [TestMethod]
         public void It_can_be_used_as_an_IDisposable()
         {
-            Consumer.Use(_borrowedDisposable.AsDisposableUnsafe());
+            Consumer.Use(_borrowedDisposable.UnsafeValue);
         }
 
         [TestMethod]

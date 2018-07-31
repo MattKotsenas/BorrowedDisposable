@@ -2,20 +2,25 @@
 
 namespace Lagan.Core
 {
-    public struct Owned<T> : IDisposable where T : IDisposable
+    public interface Owned<out T> : IDisposable where T : IDisposable
     {
-        internal readonly T Inner;
+        T UnsafeValue { get; } // TODO: Is there a way to remove this?
+    }
 
-        internal Owned(T inner)
+    internal struct OwnedContainer<T> : Owned<T> where T : IDisposable
+    {
+        public T UnsafeValue { get; }
+
+        internal OwnedContainer(T value)
         {
-            Inner = inner;
+            UnsafeValue = value;
         }
 
         private void Dispose(bool disposing)
         {
             if (disposing)
             {
-                Inner.Dispose();
+                UnsafeValue.Dispose();
             }
         }
 
