@@ -2,11 +2,11 @@
 
 namespace Lagan.Core
 {
-    public struct OwnedDisposable<T> : IDisposable where T : IDisposable
+    public struct Owned<T> : IDisposable where T : IDisposable
     {
         internal readonly T Inner;
 
-        internal OwnedDisposable(T inner)
+        internal Owned(T inner)
         {
             Inner = inner;
         }

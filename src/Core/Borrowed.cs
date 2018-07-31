@@ -2,12 +2,12 @@ using System;
 
 namespace Lagan.Core
 {
-    public struct BorrowedDisposable<T> : IDisposable where T : IDisposable
+    public struct Borrowed<T> : IDisposable where T : IDisposable
     {
         internal readonly T Inner;
         private readonly bool _isStrict; // TODO: Should this be part of the final API design?
 
-        internal BorrowedDisposable(T inner, bool isStrict = false)
+        internal Borrowed(T inner, bool isStrict = false)
         {
             Inner = inner;
             _isStrict = isStrict;
@@ -19,7 +19,7 @@ namespace Lagan.Core
             {
                 if (_isStrict)
                 {
-                    throw new InvalidOperationException($"Attempt to dispose of a {nameof(BorrowedDisposable<T>)}");
+                    throw new InvalidOperationException($"Attempt to dispose of a {nameof(Borrowed<T>)}");
                 }
             }
         }
