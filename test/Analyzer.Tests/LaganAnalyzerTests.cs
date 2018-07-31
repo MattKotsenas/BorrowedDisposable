@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Lagan.Analyzer.Tests.Helpers;
 using Lagan.Analyzer.Tests.Verifiers;
-using System.Linq;
 
 namespace Lagan.Analyzer.Tests
 {
@@ -41,6 +40,7 @@ namespace Lagan.Analyzer.Tests
                         public static void Main() { }
                     }
                 }";
+
                 var expected = new DiagnosticResult
                 {
                     Id = LaganAnalyzer.DiagnosticId,
@@ -79,6 +79,30 @@ namespace Lagan.Analyzer.Tests
         }
 
         [TestClass]
+        public class WithAnOwnedType : LaganCodeFixVerifier
+        {
+            [TestMethod]
+            public void ItDoesNotGiveAnAnalyzerWarning()
+            {
+                var test = @"
+                using System.IO;
+                using Lagan.Core;
+
+                namespace ConsoleApplication1
+                {
+                    class TypeName
+                    {
+                        private Owned<Stream> _stream;
+
+                        public static void Main() { }
+                    }
+                }";
+
+                VerifyCSharpDiagnostic(test);
+            }
+        }
+
+        [TestClass]
         public class WithABorrowedAnnotation : LaganCodeFixVerifier
         {
             [TestMethod]
@@ -94,6 +118,30 @@ namespace Lagan.Analyzer.Tests
                     {
                         [Borrowed]
                         private Stream _stream;
+
+                        public static void Main() { }
+                    }
+                }";
+
+                VerifyCSharpDiagnostic(test);
+            }
+        }
+
+        [TestClass]
+        public class WithABorrowedType : LaganCodeFixVerifier
+        {
+            [TestMethod]
+            public void ItDoesNotGiveAnAnalyzerWarning()
+            {
+                var test = @"
+                using System.IO;
+                using Lagan.Core;
+
+                namespace ConsoleApplication1
+                {
+                    class TypeName
+                    {
+                        private Borrowed<Stream> _stream;
 
                         public static void Main() { }
                     }
@@ -124,6 +172,7 @@ namespace Lagan.Analyzer.Tests
                         public static void Main() { }
                     }
                 }";
+
                 var expected = new DiagnosticResult
                 {
                     Id = LaganAnalyzer.DiagnosticId,
@@ -161,6 +210,30 @@ namespace Lagan.Analyzer.Tests
         }
 
         [TestClass]
+        public class WithAnOwnedType : LaganCodeFixVerifier
+        {
+            [TestMethod]
+            public void ItDoesNotGiveAnAnalyzerWarning()
+            {
+                var test = @"
+                using System.IO;
+                using Lagan.Core;
+
+                namespace ConsoleApplication1
+                {
+                    class TypeName
+                    {
+                        private void UseDisposable(Owned<Stream> stream) { }
+
+                        public static void Main() { }
+                    }
+                }";
+
+                VerifyCSharpDiagnostic(test);
+            }
+        }
+
+        [TestClass]
         public class WithABorrowedAnnotation : LaganCodeFixVerifier
         {
             [TestMethod]
@@ -175,6 +248,30 @@ namespace Lagan.Analyzer.Tests
                     class TypeName
                     {
                         private void UseDisposable([Borrowed] Stream stream) { }
+
+                        public static void Main() { }
+                    }
+                }";
+
+                VerifyCSharpDiagnostic(test);
+            }
+        }
+
+        [TestClass]
+        public class WithABorrowedType : LaganCodeFixVerifier
+        {
+            [TestMethod]
+            public void ItDoesNotGiveAnAnalyzerWarning()
+            {
+                var test = @"
+                using System.IO;
+                using Lagan.Core;
+
+                namespace ConsoleApplication1
+                {
+                    class TypeName
+                    {
+                        private void UseDisposable(Borrowed<Stream> stream) { }
 
                         public static void Main() { }
                     }

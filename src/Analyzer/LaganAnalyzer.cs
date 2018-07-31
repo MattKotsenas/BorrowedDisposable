@@ -26,25 +26,41 @@ namespace Lagan.Analyzer
             context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.Parameter, SyntaxKind.FieldDeclaration, SyntaxKind.VariableDeclaration);
         }
 
-        private static bool ImplementsIDisposable(ITypeSymbol typeSymbol)
+        private static bool ImplementsIDisposable(ITypeSymbol symbol)
         {
-            return typeSymbol.AllInterfaces.Any(i => i.ContainingNamespace.Name == "System" && i.Name == "IDisposable");
+            return symbol.AllInterfaces.Any(i => i.ContainingNamespace.Name == "System" && i.Name == "IDisposable");
         }
 
-        private static bool IsOwnedAttribute(ITypeSymbol attribute)
+        private static bool IsOwnedAttribute(ITypeSymbol symbol)
         {
             var ns = typeof(OwnedAttribute).Namespace;
             var name = nameof(OwnedAttribute);
 
-            return attribute.ContainingNamespace.ToDisplayString() == ns && attribute.Name == name;
+            return symbol.ContainingNamespace.ToDisplayString() == ns && symbol.Name == name;
         }
 
-        private static bool IsBorrowedAttribute(ITypeSymbol attribute)
+        private static bool IsBorrowedAttribute(ITypeSymbol symbol)
         {
             var ns = typeof(BorrowedAttribute).Namespace;
             var name = nameof(BorrowedAttribute);
 
-            return attribute.ContainingNamespace.ToDisplayString() == ns && attribute.Name == name;
+            return symbol.ContainingNamespace.ToDisplayString() == ns && symbol.Name == name;
+        }
+
+        private static bool IsOwnedType(ITypeSymbol symbol)
+        {
+            var ns = typeof(Owned<>).Namespace;
+            var name = nameof(Owned<IDisposable>);
+
+            return symbol.ContainingNamespace.ToDisplayString() == ns && symbol.Name == name;
+        }
+
+        private static bool IsBorrowedType(ITypeSymbol symbol)
+        {
+            var ns = typeof(Borrowed<>).Namespace;
+            var name = nameof(Borrowed<IDisposable>);
+
+            return symbol.ContainingNamespace.ToDisplayString() == ns && symbol.Name == name;
         }
 
         private static IReadOnlyCollection<ITypeSymbol> GetAttributeSymbols(SyntaxNode node, SemanticModel model)
@@ -66,7 +82,7 @@ namespace Lagan.Analyzer
                 var attributes = GetAttributeSymbols(field, context.SemanticModel);
                 var typeInfo = context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type;
 
-                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute))
+                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute) && !IsOwnedType(typeInfo) && !IsBorrowedType(typeInfo))
                 {
                     foreach (var identifier in field.Declaration.Variables.Select(variable => variable.Identifier))
                     {
@@ -80,7 +96,7 @@ namespace Lagan.Analyzer
                 var attributes = GetAttributeSymbols(parameter, context.SemanticModel);
                 var typeInfo = context.SemanticModel.GetTypeInfo(parameter.Type).Type;
 
-                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute))
+                if (ImplementsIDisposable(typeInfo) && !attributes.Any(IsOwnedAttribute) && !attributes.Any(IsBorrowedAttribute) && !IsOwnedType(typeInfo) && !IsBorrowedType(typeInfo))
                 {
                     var identifier = parameter.Identifier;
                     var diagnostic = Diagnostic.Create(MissingLifetimeDiagnostic.Rule, identifier.GetLocation(), identifier.ValueText);
