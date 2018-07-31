@@ -17,8 +17,8 @@ namespace Lagan.Analyzer
         public static readonly string DiagnosticId = "LaganAnalyzer";
         public static readonly string Category = "Design";
 
-        public static readonly IDiagnostic MissingLifetimeDiagnostic = new MissingLifetimeDiagnostic();
-        public static readonly IDiagnostic UnnecessaryLifetimeDiagnostic = new UnnecessaryLifetimeDiagnostic();
+        public static readonly IDiagnostic MissingLifetimeDiagnostic = new MissingAnnotationDiagnostic();
+        public static readonly IDiagnostic UnnecessaryLifetimeDiagnostic = new UnnecessaryAnnotationDiagnostic();
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(MissingLifetimeDiagnostic.Rule, UnnecessaryLifetimeDiagnostic.Rule);
 

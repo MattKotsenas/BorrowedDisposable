@@ -64,54 +64,54 @@ namespace Lagan.Analyzer {
         /// <summary>
         ///   Looks up a localized string similar to Instances of IDisposable should be marked as owned or borrowed for explicit lifetime management.
         /// </summary>
-        internal static string MissingLifetimeDescription {
+        internal static string MissingAnnotationDescription {
             get {
-                return ResourceManager.GetString("MissingLifetimeDescription", resourceCulture);
+                return ResourceManager.GetString("MissingAnnotationDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Variable &apos;{0}&apos; implements IDisposable and has ambiguous lifetime.
         /// </summary>
-        internal static string MissingLifetimeMessageFormat {
+        internal static string MissingAnnotationMessageFormat {
             get {
-                return ResourceManager.GetString("MissingLifetimeMessageFormat", resourceCulture);
+                return ResourceManager.GetString("MissingAnnotationMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Instances of IDisposable have explicit lifetime.
         /// </summary>
-        internal static string MissingLifetimeTitle {
+        internal static string MissingAnnotationTitle {
             get {
-                return ResourceManager.GetString("MissingLifetimeTitle", resourceCulture);
+                return ResourceManager.GetString("MissingAnnotationTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Instances that do not implement IDisposable should not be annotated.
         /// </summary>
-        internal static string UnnecessaryLifetimeDescription {
+        internal static string UnnecessaryAnnotationDescription {
             get {
-                return ResourceManager.GetString("UnnecessaryLifetimeDescription", resourceCulture);
+                return ResourceManager.GetString("UnnecessaryAnnotationDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Variable &apos;{0}&apos; does not implement IDisposable and should not be annotated.
         /// </summary>
-        internal static string UnnecessaryLifetimeMessageFormat {
+        internal static string UnnecessaryAnnotationMessageFormat {
             get {
-                return ResourceManager.GetString("UnnecessaryLifetimeMessageFormat", resourceCulture);
+                return ResourceManager.GetString("UnnecessaryAnnotationMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Lifetime annotation on non-disposable types.
         /// </summary>
-        internal static string UnnecessaryLifetimeTitle {
+        internal static string UnnecessaryAnnotationTitle {
             get {
-                return ResourceManager.GetString("UnnecessaryLifetimeTitle", resourceCulture);
+                return ResourceManager.GetString("UnnecessaryAnnotationTitle", resourceCulture);
             }
         }
     }
